@@ -78,5 +78,10 @@ dependencies {
 
     implementation ("androidx.navigation:navigation-compose:2.6.0")
 
-    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+
+    implementation("io.insert-koin:koin-android:2.2.3")
+    implementation("io.insert-koin:koin-android-scope:2.2.3")
+    implementation("io.insert-koin:koin-android-viewmodel:2.2.3")
+
 }

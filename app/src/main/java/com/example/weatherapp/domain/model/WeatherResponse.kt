@@ -1,4 +1,4 @@
-package com.example.weatherapp.weatherapiresponse
+package com.example.weatherapp.domain.model
 
 import com.google.gson.annotations.Expose
 

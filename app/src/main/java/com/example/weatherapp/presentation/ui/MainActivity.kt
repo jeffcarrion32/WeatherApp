@@ -1,6 +1,8 @@
-package com.example.weatherapp
+package com.example.weatherapp.presentation.ui
 
+import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
@@ -31,17 +35,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.weatherapp.ui.theme.WeatherAppTheme
-import com.example.weatherapp.weatherapiresponse.NetworkStateResponse
-import com.example.weatherapp.weatherapiresponse.Weather
-import com.example.weatherapp.weatherapiresponse.WeatherResponse
-import com.example.weatherapp.weatherviewmodel.WeatherViewModel
+import com.example.weatherapp.data.networking.WeatherApiClient
+import com.example.weatherapp.data.repository.WeatherRepository
+import com.example.weatherapp.domain.model.NetworkStateResponse
+import com.example.weatherapp.domain.model.Weather
+import com.example.weatherapp.domain.model.WeatherResponse
+import com.example.weatherapp.presentation.ui.theme.WeatherAppTheme
+import com.example.weatherapp.presentation.viewmodel.WeatherViewModel
+import org.koin.android.ext.android.get
+import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel: WeatherViewModel by viewModel()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
-
         setContent {
             WeatherAppTheme {
                 // A surface container using the 'background' color from the theme
@@ -62,10 +71,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WeatherNavHost(
     navController: NavHostController = rememberNavController(),
-    startDestination : String,
+    startDestination: String,
     viewModel: WeatherViewModel
 ) {
     val inputCity = remember { mutableStateOf("") }
+    inputCity.value = LocalContext.current
+        .getSharedPreferences("appSharedPres", MODE_PRIVATE)
+        .getString("userLastSearch", "").orEmpty()
 
     NavHost(
         navController = navController,
@@ -86,20 +98,35 @@ fun MainScreen(
     navController: NavHostController = rememberNavController(),
     inputCity: MutableState<String>
 ) {
-    when(viewModel.response.value) {
+    when (viewModel.networkResponse.value) {
         is NetworkStateResponse.Failure -> {
-
+            Toast.makeText(
+                LocalContext.current,
+                "Error getting weather data",
+                Toast.LENGTH_SHORT
+            ).show()
         }
+
         is NetworkStateResponse.Loading -> {
 
         }
+
         is NetworkStateResponse.Success -> {
+            LocalContext.current
+                .getSharedPreferences("appSharedPres", MODE_PRIVATE).edit()
+                .putString("userLastSearch", inputCity.value)
+                .apply()
             navController.navigate("detailview")
-            viewModel.response.value = null
+            viewModel.networkResponse.value = null
         }
+
         else -> {}
     }
-    Column {
+    Column(
+        Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
         TextField(
             value = inputCity.value,
             onValueChange = { inputCity.value = it },
@@ -107,10 +134,13 @@ fun MainScreen(
         )
         Button(
             onClick = {
-                viewModel.makeRequest(inputCity.value)
+                viewModel.makeWeatherRequest(inputCity.value)
             }
         ) {
             Text(text = "Search")
+        }
+        if (viewModel.networkResponse.value == NetworkStateResponse.Loading) {
+            CircularProgressIndicator()
         }
     }
 }
@@ -124,7 +154,8 @@ fun DetailView(response: WeatherResponse?, navController: NavHostController) {
 
         Button(
             onClick = {
-                navController.navigate("searchview") }
+                navController.navigate("searchview")
+            }
         ) {
             Text(text = "Back")
         }
@@ -161,11 +192,11 @@ fun DetailCard(details: Weather) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainScreenPreview() {
     WeatherAppTheme {
         WeatherNavHost(
             startDestination = "searchview",
-            viewModel = WeatherViewModel()
+            viewModel = WeatherViewModel(WeatherRepository(WeatherApiClient()))
         )
     }
 }
