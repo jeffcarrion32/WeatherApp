@@ -1,13 +1,11 @@
 package com.example.weatherapp.repository
 
 import com.example.weatherapp.weatherapiresponse.WeatherResponse
-import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.POST
 import retrofit2.http.Query
 
 
-interface MyApi {
+interface IApiRequest {
     @GET("weather")
     suspend fun getWeather(
         @Query("q")

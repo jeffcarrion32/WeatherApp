@@ -12,8 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class WeatherViewModel(
-    val repository: WeatherRepository = WeatherRepository(),
-    val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val repository: WeatherRepository = WeatherRepository(),
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ): ViewModel() {
     private val _response: MutableState<NetworkStateResponse?> = mutableStateOf(NetworkStateResponse.Loading)
     val response = _response

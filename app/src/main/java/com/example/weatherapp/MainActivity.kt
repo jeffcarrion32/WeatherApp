@@ -90,7 +90,7 @@ fun MainScreen(
         is NetworkStateResponse.Failure -> {
 
         }
-        NetworkStateResponse.Loading -> {
+        is NetworkStateResponse.Loading -> {
 
         }
         is NetworkStateResponse.Success -> {

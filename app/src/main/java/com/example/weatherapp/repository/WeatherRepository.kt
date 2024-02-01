@@ -7,7 +7,7 @@ import kotlinx.coroutines.withContext
 class WeatherRepository {
     suspend fun getWeatherResponse(dispatcher: CoroutineDispatcher, value: String): WeatherResponse  {
         return withContext(dispatcher) {
-            val response = RetroFit().api.getWeather(cityName = value)
+            val response = RetroFitBuilder().api.getWeather(cityName = value)
 
             response
         }
