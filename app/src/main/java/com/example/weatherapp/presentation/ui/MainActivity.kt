@@ -29,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -37,12 +36,12 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.weatherapp.data.networking.WeatherApiClient
 import com.example.weatherapp.data.repository.WeatherRepository
+import com.example.weatherapp.domain.model.Main
 import com.example.weatherapp.domain.model.NetworkStateResponse
 import com.example.weatherapp.domain.model.Weather
 import com.example.weatherapp.domain.model.WeatherResponse
 import com.example.weatherapp.presentation.ui.theme.WeatherAppTheme
 import com.example.weatherapp.presentation.viewmodel.WeatherViewModel
-import org.koin.android.ext.android.get
 import org.koin.android.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
@@ -148,9 +147,7 @@ fun MainScreen(
 @Composable
 fun DetailView(response: WeatherResponse?, navController: NavHostController) {
     Column {
-        response?.weather?.forEach {
-            DetailCard(details = it)
-        }
+        DetailCard(details = response?.main, weather = response?.weather)
 
         Button(
             onClick = {
@@ -164,7 +161,7 @@ fun DetailView(response: WeatherResponse?, navController: NavHostController) {
 
 
 @Composable
-fun DetailCard(details: Weather) {
+fun DetailCard(details: Main?, weather: List<Weather>?) {
     Card(modifier = Modifier.fillMaxWidth(1f)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -172,7 +169,7 @@ fun DetailCard(details: Weather) {
         ) {
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = "https://openweathermap.org/img/wn/${details.icon}@2x.png"
+                    model = "https://openweathermap.org/img/wn/${weather?.get(0)?.icon}@2x.png"
                 ),
                 contentDescription = null,
                 modifier = Modifier.size(48.dp)
@@ -183,8 +180,14 @@ fun DetailCard(details: Weather) {
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier.fillMaxWidth(1f)
             ) {
-                Text(text = details.main)
-                Text(text = details.description)
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(text = details?.temp.toString())
+                    Text(text = "Temperature")
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(text = details?.humidity.toString())
+                    Text(text = "Humidity")
+                }
             }
         }
     }
