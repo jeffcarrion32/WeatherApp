@@ -5,7 +5,7 @@ import com.example.weatherapp.data.networking.WeatherApiClient
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
-class WeatherRepository(val weatherApiClient: WeatherApiClient) {
+class WeatherRepository(private val weatherApiClient: WeatherApiClient) {
     suspend fun getWeatherResponse(dispatcher: CoroutineDispatcher, value: String): WeatherResponse {
         return withContext(dispatcher) {
             val response = weatherApiClient.api.getWeather(cityName = value)

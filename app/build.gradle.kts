@@ -59,6 +59,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.test.ext:junit-ktx:1.1.5")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -84,4 +85,17 @@ dependencies {
     implementation("io.insert-koin:koin-android-scope:2.2.3")
     implementation("io.insert-koin:koin-android-viewmodel:2.2.3")
 
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.11.1")
+
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.8.1")
+
 }
+
+
+
+//
+//    // Test rules and transitive dependencies:
+//    androidTestImplementation("androidx.compose.ui:ui-test-junit4:2023.08.00")
+//    // Needed for createAndroidComposeRule, but not createComposeRule:
+//    debugImplementation("androidx.compose.ui:ui-test-manifest:2023.08.00")

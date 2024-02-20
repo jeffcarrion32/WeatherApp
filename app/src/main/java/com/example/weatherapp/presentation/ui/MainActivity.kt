@@ -83,10 +83,18 @@ fun WeatherNavHost(
         startDestination = startDestination,
     ) {
         composable(route = "searchview") {
-            MainScreen(viewModel = viewModel, navController = navController, inputCity = inputCity)
+            MainScreen(
+                viewModel = viewModel,
+                navController = navController,
+                inputCity = inputCity
+            )
         }
         composable(route = "detailview") {
-            DetailView(response = viewModel.weather, navController = navController)
+            DetailView(
+                response = viewModel.weatherResponse.value,
+                navController = navController,
+                temperature = viewModel.temperature
+            )
         }
     }
 }
@@ -145,9 +153,13 @@ fun MainScreen(
 }
 
 @Composable
-fun DetailView(response: WeatherResponse?, navController: NavHostController) {
+fun DetailView(response: WeatherResponse?, navController: NavHostController, temperature: Double) {
     Column {
-        DetailCard(details = response?.main, weather = response?.weather)
+        DetailCard(
+            details = response?.main,
+            weather = response?.weather,
+            temperature = temperature
+        )
 
         Button(
             onClick = {
@@ -161,7 +173,7 @@ fun DetailView(response: WeatherResponse?, navController: NavHostController) {
 
 
 @Composable
-fun DetailCard(details: Main?, weather: List<Weather>?) {
+fun DetailCard(details: Main?, weather: List<Weather>?, temperature: Double) {
     Card(modifier = Modifier.fillMaxWidth(1f)) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -181,7 +193,7 @@ fun DetailCard(details: Main?, weather: List<Weather>?) {
                 modifier = Modifier.fillMaxWidth(1f)
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Text(text = details?.temp.toString())
+                    Text(text = "$temperature °F")
                     Text(text = "Temperature")
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
